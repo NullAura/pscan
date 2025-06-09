@@ -17,7 +17,10 @@ class PortScannerGUI:
     def __init__(self):
         self.window = ctk.CTk()
         self.window.title("端口扫描工具 - GUI版本")
-        self.window.geometry("900x700")
+        self.window.geometry("950x800")
+        
+        # 设置窗口最小尺寸
+        self.window.minsize(800, 600)
         
         # 创建扫描器实例
         self.scanner = PortScanner()
@@ -32,9 +35,13 @@ class PortScannerGUI:
         self.window.after(100, self.check_result_queue)
     
     def setup_ui(self):
-        # 主框架
-        main_frame = ctk.CTkFrame(self.window)
-        main_frame.pack(fill="both", expand=True, padx=20, pady=20)
+        # 创建主滚动框架
+        main_scrollable_frame = ctk.CTkScrollableFrame(self.window)
+        main_scrollable_frame.pack(fill="both", expand=True, padx=10, pady=10)
+        
+        # 主内容框架
+        main_frame = ctk.CTkFrame(main_scrollable_frame)
+        main_frame.pack(fill="both", expand=True, padx=10, pady=10)
         
         # 标题
         title_label = ctk.CTkLabel(main_frame, text="端口扫描工具", font=ctk.CTkFont(size=24, weight="bold"))
@@ -140,16 +147,26 @@ class PortScannerGUI:
         self.status_label = ctk.CTkLabel(control_frame, text="就绪")
         self.status_label.pack(pady=(0, 15))
         
-        # 结果显示
+        # 结果显示区域 - 设置固定高度，确保可见
         result_frame = ctk.CTkFrame(main_frame)
-        result_frame.pack(fill="both", expand=True, padx=20, pady=(0, 20))
+        result_frame.pack(fill="x", padx=20, pady=(0, 20))
         
         result_label = ctk.CTkLabel(result_frame, text="扫描结果", font=ctk.CTkFont(size=16, weight="bold"))
         result_label.pack(pady=(15, 10))
         
-        # 结果文本框
-        self.result_text = ctk.CTkTextbox(result_frame, height=200, font=ctk.CTkFont(family="Courier"))
-        self.result_text.pack(fill="both", expand=True, padx=15, pady=(0, 15))
+        # 结果文本框 - 设置合适的固定高度
+        self.result_text = ctk.CTkTextbox(result_frame, height=300, font=ctk.CTkFont(family="Courier"))
+        self.result_text.pack(fill="x", padx=15, pady=(0, 15))
+        
+        # 添加结果操作按钮
+        result_button_frame = ctk.CTkFrame(result_frame)
+        result_button_frame.pack(pady=(0, 15))
+        
+        clear_button = ctk.CTkButton(result_button_frame, text="清空结果", command=self.clear_results, width=100)
+        clear_button.pack(side="left", padx=(0, 10))
+        
+        copy_button = ctk.CTkButton(result_button_frame, text="复制结果", command=self.copy_results, width=100)
+        copy_button.pack(side="left")
     
     def update_thread_label(self, value):
         self.thread_value_label.configure(text=str(int(value)))
@@ -251,6 +268,35 @@ class PortScannerGUI:
         self.stop_button.configure(state="disabled")
         self.status_label.configure(text="扫描已停止")
     
+    def clear_results(self):
+        """清空扫描结果"""
+        self.result_text.delete("1.0", "end")
+        self.status_label.configure(text="结果已清空")
+    
+    def copy_results(self):
+        """复制结果到剪贴板"""
+        content = self.result_text.get("1.0", "end-1c")
+        if not content.strip():
+            messagebox.showwarning("警告", "没有结果可复制")
+            return
+        
+        try:
+            self.window.clipboard_clear()
+            self.window.clipboard_append(content)
+            self.status_label.configure(text="结果已复制到剪贴板")
+        except Exception as e:
+            messagebox.showerror("错误", f"复制失败: {e}")
+    
+    def scroll_to_bottom(self):
+        """滚动到结果区域底部"""
+        try:
+            # 确保滚动到文本框底部
+            self.result_text.see("end")
+            # 更新界面
+            self.window.update_idletasks()
+        except Exception:
+            pass
+    
     def save_results(self):
         content = self.result_text.get("1.0", "end-1c")
         if not content.strip():
@@ -282,9 +328,12 @@ class PortScannerGUI:
                 elif msg_type == 'result':
                     self.result_text.insert("end", msg_data + "\n")
                     self.result_text.see("end")
+                    # 自动滚动到最新结果
+                    self.scroll_to_bottom()
                 elif msg_type == 'summary':
                     self.result_text.insert("end", "\n" + msg_data + "\n" + "="*50 + "\n")
                     self.result_text.see("end")
+                    self.scroll_to_bottom()
                 elif msg_type == 'progress':
                     self.progress_bar.set(msg_data)
                 elif msg_type == 'complete':
