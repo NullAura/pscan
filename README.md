@@ -70,15 +70,23 @@ pscan -p 80,443 example.com
 
 ## 使用方法
 
-### 命令行版本
+### 智能启动模式
 
-```
-python pscan.py [target]
+```bash
+# 不带任何参数：自动启动图形化界面
+python pscan.py
+
+# 带参数：使用命令行模式
+python pscan.py [options] [target]
 ```
 
-### GUI版本
+### 图形化界面
 
-```
+```bash
+# 方法1：智能启动（推荐）
+python pscan.py
+
+# 方法2：直接启动GUI
 python pscan_gui.py
 ```
 
@@ -87,6 +95,14 @@ python pscan_gui.py
 - 可视化的扫描设置（端口范围、扫描类型、线程数）
 - 实时的扫描进度显示
 - 结果的可视化展示和保存功能
+
+### 命令行模式
+
+当提供任何命令行参数时，自动使用命令行模式：
+
+```bash
+python pscan.py [options] [target]
+```
 
 ### 命令行参数说明
 

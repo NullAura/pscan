@@ -33,6 +33,25 @@ def summary_callback(message):
     print(f"\n{message}")
 
 def main():
+    # 检查是否没有提供任何参数，如果没有则启动GUI
+    if len(sys.argv) == 1:
+        try:
+            print("未检测到命令行参数，启动图形化界面...")
+            # 导入并启动GUI
+            from pscan_gui import PortScannerGUI
+            app = PortScannerGUI()
+            app.run()
+            return
+        except ImportError as e:
+            print(f"启动图形化界面失败: {e}")
+            print("请安装GUI依赖: pip install -r requirements.txt")
+            print("或使用命令行模式: python pscan.py --help")
+            sys.exit(1)
+        except Exception as e:
+            print(f"图形化界面启动错误: {e}")
+            print("正在切换到命令行模式...")
+            print("使用 --help 查看命令行参数")
+    
     args = parse_arguments()
     
     # 验证线程数范围
