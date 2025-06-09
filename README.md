@@ -2,6 +2,11 @@
 
 这是一个基于Python的端口扫描工具，支持多种扫描方式，包括TCP SYN扫描、TCP Connect扫描和UDP扫描。
 
+## 版本说明
+
+- **pscan.py** - 命令行版本，适合脚本使用和自动化
+- **pscan_gui.py** - 图形界面版本，用户友好的可视化界面
+
 ## 常见扫描分类
 
 - TCP SYN扫描：发送SYN包，如果收到SYN-ACK，则端口开放；如果收到RST，则端口关闭。
@@ -19,10 +24,13 @@
    ```
    pip install -r requirements.txt
    ```
+   
+   **注意**：GUI版本需要额外安装customtkinter和pillow包
 
 3. 给予执行权限（Linux/macOS）：
    ```
    chmod +x pscan.py
+   chmod +x pscan_gui.py
    ```
 
 ## 可选：配置到环境变量
@@ -62,13 +70,25 @@ pscan -p 80,443 example.com
 
 ## 使用方法
 
-### 基本使用
+### 命令行版本
 
 ```
 python pscan.py [target]
 ```
-默认只扫描常用端口
-### 参数说明
+
+### GUI版本
+
+```
+python pscan_gui.py
+```
+
+启动后会打开图形界面，包含以下功能：
+- 直观的目标输入和文件选择
+- 可视化的扫描设置（端口范围、扫描类型、线程数）
+- 实时的扫描进度显示
+- 结果的可视化展示和保存功能
+
+### 命令行参数说明
 
 - `-p<port ranges>` - 指定端口范围
   - 例如：`python pscan.py -p 22,80,443 192.168.1.1`
